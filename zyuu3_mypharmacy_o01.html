@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=ISO-8859-1" />
+<title>ZYUU3_MYPHARMACY_O01</title>
+<style type="text/css">
+.code{ font-family:"Courier New", Courier, monospace; color:#000; font-size:14px; background-color:#F2F4F7 }
+  .codeComment {font-family:"Courier New", Courier, monospace; color:#0000F0; font-size:14px; background-color:#F2F4F7 }
+  .normalBold{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px; font-weight:800 }
+  .normalBoldLarge{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:16px; font-weight:800 }
+</style>
+<style type="text/css">
+  .normal{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px }
+  .footer{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px; text-align: center }
+  h2{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:16px; font-weight:800 }
+  h3{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:14px; font-weight:800 }
+  .outerTable{
+   background-color:#E0E7ED;
+   width:100%;
+   border-top-width: thin;
+   border-right-width: thin;
+   border-right-width: thin;
+   border-left-width: thin;
+   border-top-style: solid;
+   border-right-style: solid;
+   border-bottom-style: solid;
+   border-left-style: solid;
+  }
+  .innerTable{
+   background-color:#F2F4F7;
+   width:100%;
+   border-top-width: thin;
+   border-right-width: thin;
+   border-bottom-width: thin;
+   border-left-width: thin;
+   border-top-style: solid;
+   border-right-style: solid;
+   border-bottom-style: solid;
+   border-left-style: solid;
+  }
+</style>
+</head>
+<body>
+<table class="outerTable">
+  <tr class="normalBoldLarge">
+     <td><h2>Code listing for: ZYUU3_MYPHARMACY_O01</h2>
+<h3> Description: Include ZYUU3_MYPHARMACY_O01</h3></td>
+   </tr>
+  <tr>
+     <td>
+     <table class="innerTable">
+       <tr>
+          <td>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Include&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZYUU3_MYPHARMACY_O01<br />
+*&---------------------------------------------------------------------*<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Module&nbsp;STATUS_0100&nbsp;OUTPUT<br />
+*&---------------------------------------------------------------------*<br />
+*&<br />
+*&---------------------------------------------------------------------*<br />
+   </div>
+   <div class="code">
+MODULE status_0100 OUTPUT.<br />
+&nbsp;&nbsp;SET&nbsp;PF-STATUS&nbsp;'0100'.<br />
+&nbsp;&nbsp;SET&nbsp;TITLEBAR&nbsp;'0100'.<br />
+<br />
+&nbsp;&nbsp;LOOP&nbsp;AT&nbsp;SCREEN.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;screen-group1&nbsp;=&nbsp;'GR1'&nbsp;AND&nbsp;add_info&nbsp;&lt;&gt;&nbsp;abap_true.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;screen-active&nbsp;=&nbsp;'0'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MODIFY&nbsp;SCREEN.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ELSEIF&nbsp;screen-group1&nbsp;=&nbsp;'GR1'&nbsp;AND&nbsp;add_info&nbsp;=&nbsp;abap_true.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;screen-active&nbsp;=&nbsp;'1'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MODIFY&nbsp;SCREEN.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ENDIF.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ENDLOOP.<br />
+<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;Displaying&nbsp;statistic&nbsp;data&nbsp;to&nbsp;screen&nbsp;0100<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;SELECT&nbsp;COUNT(&nbsp;*&nbsp;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_drug<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;@DATA(product_count).<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;COUNT(&nbsp;*&nbsp;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;@DATA(order_count).<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;COUNT(&nbsp;*&nbsp;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;ZYUU3_D_customer<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;@DATA(customer_count).<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;COUNT(&nbsp;*&nbsp;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;ZYUU3_D_customer<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;gender&nbsp;=&nbsp;'M'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;@DATA(male_count).<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;COUNT(&nbsp;*&nbsp;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;ZYUU3_D_customer<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;gender&nbsp;=&nbsp;'F'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;@DATA(female_count).<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;d~drug_name,&nbsp;COUNT(&nbsp;o~id&nbsp;)&nbsp;AS&nbsp;drug_count<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order_it&nbsp;AS&nbsp;o<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;zyuu3_d_drug&nbsp;AS&nbsp;d&nbsp;ON&nbsp;d~drug_id&nbsp;=&nbsp;o~drug_id<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GROUP&nbsp;BY&nbsp;d~drug_name<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ORDER&nbsp;BY&nbsp;drug_count&nbsp;DESCENDING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@DATA(top_products_list)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;UP&nbsp;TO&nbsp;3&nbsp;ROWS.<br />
+<br />
+&nbsp;&nbsp;LOOP&nbsp;AT&nbsp;top_products_list&nbsp;INTO&nbsp;DATA(wa_product).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CONCATENATE&nbsp;wa_product-drug_name&nbsp;'&nbsp;'&nbsp;top_products&nbsp;INTO&nbsp;top_products&nbsp;SEPARATED&nbsp;BY&nbsp;space.<br />
+&nbsp;&nbsp;ENDLOOP.<br />
+<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;Set&nbsp;dropdown&nbsp;list<br />
+*&nbsp;&nbsp;DATA:&nbsp;g_name&nbsp;TYPE&nbsp;vrm_id,<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;g_list&nbsp;&nbsp;TYPE&nbsp;vrm_values,<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;g_value&nbsp;LIKE&nbsp;LINE&nbsp;OF&nbsp;g_list.<br />
+*<br />
+*&nbsp;&nbsp;CLEAR:&nbsp;g_value,&nbsp;g_list.<br />
+*&nbsp;&nbsp;g_value-key&nbsp;=&nbsp;'1'.<br />
+*&nbsp;&nbsp;g_value-text&nbsp;=&nbsp;'18-24'.<br />
+*&nbsp;&nbsp;APPEND&nbsp;g_value&nbsp;TO&nbsp;g_list.<br />
+*<br />
+*&nbsp;&nbsp;g_value-key&nbsp;=&nbsp;'2'.<br />
+*&nbsp;&nbsp;g_value-text&nbsp;=&nbsp;'25-34'.<br />
+*&nbsp;&nbsp;APPEND&nbsp;g_value&nbsp;TO&nbsp;g_list.<br />
+*<br />
+*&nbsp;&nbsp;g_value-key&nbsp;=&nbsp;'3'.<br />
+*&nbsp;&nbsp;g_value-text&nbsp;=&nbsp;'35-44'.<br />
+*&nbsp;&nbsp;APPEND&nbsp;g_value&nbsp;TO&nbsp;g_list.<br />
+*<br />
+*&nbsp;&nbsp;g_value-key&nbsp;=&nbsp;'4'.<br />
+*&nbsp;&nbsp;g_value-text&nbsp;=&nbsp;'45-54'.<br />
+*&nbsp;&nbsp;APPEND&nbsp;g_value&nbsp;TO&nbsp;g_list.<br />
+*<br />
+*&nbsp;&nbsp;g_value-key&nbsp;=&nbsp;'5'.<br />
+*&nbsp;&nbsp;g_value-text&nbsp;=&nbsp;'55-64'.<br />
+*&nbsp;&nbsp;APPEND&nbsp;g_value&nbsp;TO&nbsp;g_list.<br />
+*<br />
+*&nbsp;&nbsp;g_value-key&nbsp;=&nbsp;'6'.<br />
+*&nbsp;&nbsp;g_value-text&nbsp;=&nbsp;'65+'.<br />
+*&nbsp;&nbsp;APPEND&nbsp;g_value&nbsp;TO&nbsp;g_list.<br />
+*<br />
+*<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;CALL&nbsp;FUNCTION&nbsp;'VRM_SET_VALUES'<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EXPORTING<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;'AGE'<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;values&nbsp;=&nbsp;g_list.<br />
+<br />
+<br />
+<br />
+   </div>
+   <div class="code">
+ENDMODULE.<br />
+            </div>
+          </td>
+        </tr>
+      </table>
+      </td>
+      </tr>
+   <tr>
+<td class="footer">Extracted by Mass Download version 1.5.5 - E.G.Mellodew. 1998-2023. Sap Release 756</td>
+   </tr>
+</table>
+</body>
+</html>

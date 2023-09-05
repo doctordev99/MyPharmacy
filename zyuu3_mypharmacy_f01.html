@@ -1,0 +1,775 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=ISO-8859-1" />
+<title>ZYUU3_MYPHARMACY_F01</title>
+<style type="text/css">
+.code{ font-family:"Courier New", Courier, monospace; color:#000; font-size:14px; background-color:#F2F4F7 }
+  .codeComment {font-family:"Courier New", Courier, monospace; color:#0000F0; font-size:14px; background-color:#F2F4F7 }
+  .normalBold{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px; font-weight:800 }
+  .normalBoldLarge{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:16px; font-weight:800 }
+</style>
+<style type="text/css">
+  .normal{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px }
+  .footer{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px; text-align: center }
+  h2{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:16px; font-weight:800 }
+  h3{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:14px; font-weight:800 }
+  .outerTable{
+   background-color:#E0E7ED;
+   width:100%;
+   border-top-width: thin;
+   border-right-width: thin;
+   border-right-width: thin;
+   border-left-width: thin;
+   border-top-style: solid;
+   border-right-style: solid;
+   border-bottom-style: solid;
+   border-left-style: solid;
+  }
+  .innerTable{
+   background-color:#F2F4F7;
+   width:100%;
+   border-top-width: thin;
+   border-right-width: thin;
+   border-bottom-width: thin;
+   border-left-width: thin;
+   border-top-style: solid;
+   border-right-style: solid;
+   border-bottom-style: solid;
+   border-left-style: solid;
+  }
+</style>
+</head>
+<body>
+<table class="outerTable">
+  <tr class="normalBoldLarge">
+     <td><h2>Code listing for: ZYUU3_MYPHARMACY_F01</h2>
+<h3> Description: Include ZYUU3_MYPHARMACY_F01</h3></td>
+   </tr>
+  <tr>
+     <td>
+     <table class="innerTable">
+       <tr>
+          <td>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Include&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZYUU3_MYPHARMACY_F01<br />
+*&---------------------------------------------------------------------*<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Form&nbsp;display_order_list<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;--&gt;&nbsp;&nbsp;p1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&&nbsp;&lt;--&nbsp;&nbsp;p2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+   </div>
+   <div class="code">
+FORM display_order_list .<br />
+<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;Displaying&nbsp;data<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;SELECT&nbsp;o~id,&nbsp;o~order_date,&nbsp;c~first_name,&nbsp;c~last_name,&nbsp;o~payment_mode,&nbsp;o~payment_amount,&nbsp;o~payment_status<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order&nbsp;AS&nbsp;o<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;zyuu3_d_customer&nbsp;AS&nbsp;c&nbsp;ON&nbsp;c~id&nbsp;=&nbsp;o~customer_id<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@DATA(it_order_list).<br />
+<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;COUNT(&nbsp;id&nbsp;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;@DATA(lv_order_count).<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;COUNT(&nbsp;payment_amount&nbsp;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;payment_status&nbsp;=&nbsp;'COMPLETE'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;@DATA(lv_completed_orders).<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;COUNT(&nbsp;payment_amount&nbsp;)<br />
+&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order<br />
+&nbsp;&nbsp;&nbsp;WHERE&nbsp;payment_status&nbsp;=&nbsp;'FAILED'<br />
+&nbsp;&nbsp;&nbsp;INTO&nbsp;@DATA(lv_failed_orders).<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;SUM(&nbsp;payment_amount&nbsp;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;@DATA(lv_total_amount).<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;SUM(&nbsp;payment_amount&nbsp;)<br />
+&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order<br />
+&nbsp;&nbsp;&nbsp;WHERE&nbsp;payment_status&nbsp;=&nbsp;'COMPLETE'<br />
+&nbsp;&nbsp;&nbsp;INTO&nbsp;@DATA(lv_completed_orders_amount).<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;SUM(&nbsp;payment_amount&nbsp;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;payment_status&nbsp;=&nbsp;'FAILED'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;@DATA(lv_failed_orders_amount).<br />
+<br />
+&nbsp;&nbsp;TRY.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA:&nbsp;o_order_list&nbsp;TYPE&nbsp;REF&nbsp;TO&nbsp;cl_salv_table.<br />
+<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cl_salv_table=&gt;factory(&nbsp;IMPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r_salv_table&nbsp;=&nbsp;o_order_list<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CHANGING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t_table&nbsp;=&nbsp;it_order_list&nbsp;).<br />
+<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_order_header)&nbsp;=&nbsp;NEW&nbsp;cl_salv_form_layout_grid(&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_order_header-&gt;create_header_information(&nbsp;row&nbsp;=&nbsp;1&nbsp;column&nbsp;=&nbsp;1&nbsp;text&nbsp;=&nbsp;'Overal&nbsp;information&nbsp;about&nbsp;created&nbsp;orders.'&nbsp;).<br />
+<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Groupbox&nbsp;for&nbsp;General&nbsp;statistics<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_grp_order)&nbsp;=&nbsp;NEW&nbsp;cl_salv_form_groupbox(&nbsp;header&nbsp;=&nbsp;'General&nbsp;statistics'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_order_header-&gt;set_element(&nbsp;row&nbsp;=&nbsp;5&nbsp;column&nbsp;=&nbsp;1&nbsp;r_element&nbsp;=&nbsp;o_grp_order&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_grp_order_grid)&nbsp;=&nbsp;o_grp_order-&gt;create_grid(&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_grp_order_grid-&gt;set_grid_lines(&nbsp;if_salv_form_c_grid_lines=&gt;no_lines&nbsp;).<br />
+<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Labels&nbsp;+&nbsp;Text<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_label_1)&nbsp;=&nbsp;o_grp_order_grid-&gt;create_label(&nbsp;row&nbsp;=&nbsp;1&nbsp;column&nbsp;=&nbsp;1&nbsp;text&nbsp;=&nbsp;'Total&nbsp;number&nbsp;of&nbsp;orders:'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_text_1)&nbsp;=&nbsp;o_grp_order_grid-&gt;create_text(&nbsp;row&nbsp;=&nbsp;1&nbsp;column&nbsp;=&nbsp;2&nbsp;text&nbsp;=&nbsp;lv_order_count&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_label_2)&nbsp;=&nbsp;o_grp_order_grid-&gt;create_label(&nbsp;row&nbsp;=&nbsp;2&nbsp;column&nbsp;=&nbsp;1&nbsp;text&nbsp;=&nbsp;'Completed&nbsp;orders:'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_text_2)&nbsp;=&nbsp;o_grp_order_grid-&gt;create_text(&nbsp;row&nbsp;=&nbsp;2&nbsp;column&nbsp;=&nbsp;2&nbsp;text&nbsp;=&nbsp;lv_completed_orders&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_label_3)&nbsp;=&nbsp;o_grp_order_grid-&gt;create_label(&nbsp;row&nbsp;=&nbsp;3&nbsp;column&nbsp;=&nbsp;1&nbsp;text&nbsp;=&nbsp;'Failed&nbsp;orders:'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_text_3)&nbsp;=&nbsp;o_grp_order_grid-&gt;create_text(&nbsp;row&nbsp;=&nbsp;3&nbsp;column&nbsp;=&nbsp;2&nbsp;text&nbsp;=&nbsp;lv_failed_orders&nbsp;).<br />
+<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Groupbox&nbsp;for&nbsp;Financial&nbsp;statistics<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_grp_order2)&nbsp;=&nbsp;NEW&nbsp;cl_salv_form_groupbox(&nbsp;header&nbsp;=&nbsp;'Financial&nbsp;statistics'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_order_header-&gt;set_element(&nbsp;row&nbsp;=&nbsp;5&nbsp;column&nbsp;=&nbsp;2&nbsp;r_element&nbsp;=&nbsp;o_grp_order2&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_grp_order_grid2)&nbsp;=&nbsp;o_grp_order2-&gt;create_grid(&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_grp_order_grid2-&gt;set_grid_lines(&nbsp;if_salv_form_c_grid_lines=&gt;no_lines&nbsp;).<br />
+<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Labels&nbsp;+&nbsp;Text<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_label_1&nbsp;=&nbsp;o_grp_order_grid2-&gt;create_label(&nbsp;row&nbsp;=&nbsp;1&nbsp;column&nbsp;=&nbsp;1&nbsp;text&nbsp;=&nbsp;'Total&nbsp;amount&nbsp;of&nbsp;orders:'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_text_1&nbsp;=&nbsp;o_grp_order_grid2-&gt;create_text(&nbsp;row&nbsp;=&nbsp;1&nbsp;column&nbsp;=&nbsp;2&nbsp;text&nbsp;=&nbsp;lv_total_amount&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_label_2&nbsp;=&nbsp;o_grp_order_grid2-&gt;create_label(&nbsp;row&nbsp;=&nbsp;2&nbsp;column&nbsp;=&nbsp;1&nbsp;text&nbsp;=&nbsp;'Completed&nbsp;orders&nbsp;amount:'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_text_2&nbsp;=&nbsp;o_grp_order_grid2-&gt;create_text(&nbsp;row&nbsp;=&nbsp;2&nbsp;column&nbsp;=&nbsp;2&nbsp;text&nbsp;=&nbsp;lv_completed_orders_amount&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_label_3&nbsp;=&nbsp;o_grp_order_grid2-&gt;create_label(&nbsp;row&nbsp;=&nbsp;3&nbsp;column&nbsp;=&nbsp;1&nbsp;text&nbsp;=&nbsp;'Failed&nbsp;orders&nbsp;amount:'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_text_3&nbsp;=&nbsp;o_grp_order_grid2-&gt;create_text(&nbsp;row&nbsp;=&nbsp;3&nbsp;column&nbsp;=&nbsp;2&nbsp;text&nbsp;=&nbsp;lv_failed_orders_amount&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_order_list-&gt;get_functions(&nbsp;)-&gt;set_all(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_order_list-&gt;get_columns(&nbsp;)-&gt;set_optimize(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_order_list-&gt;get_display_settings(&nbsp;)-&gt;set_list_header('Order&nbsp;list').<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_order_list-&gt;get_display_settings(&nbsp;)-&gt;set_striped_pattern(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_order_list-&gt;get_selections(&nbsp;)-&gt;set_selection_mode(&nbsp;if_salv_c_selection_mode=&gt;row_column&nbsp;).<br />
+<br />
+<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_order_list-&gt;set_top_of_list(&nbsp;o_order_header&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_order_list-&gt;display(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CATCH&nbsp;cx_root&nbsp;INTO&nbsp;DATA(e_text).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE:/&nbsp;e_text-&gt;get_text(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;ENDTRY.<br />
+<br />
+ENDFORM.<br />
+   </div>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Form&nbsp;display_product_list<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;--&gt;&nbsp;&nbsp;p1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&&nbsp;&lt;--&nbsp;&nbsp;p2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+   </div>
+   <div class="code">
+FORM display_product_list .<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;d~drug_id,&nbsp;d~drug_name,&nbsp;d~manufactured_date,&nbsp;d~expire_date,&nbsp;i~quantity,&nbsp;i~price,&nbsp;d~manufacturer,&nbsp;d~category<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_drug&nbsp;AS&nbsp;d<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;zyuu3_d_inventor&nbsp;AS&nbsp;i&nbsp;ON&nbsp;&nbsp;d~drug_id&nbsp;=&nbsp;i~drug_id<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@DATA(drug_list).<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;SUM(&nbsp;quantity&nbsp;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_inventor<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;@DATA(lv_sum).<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;COUNT(&nbsp;DISTINCT&nbsp;category&nbsp;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_drug<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;@DATA(lv_category).<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;COUNT(&nbsp;DISTINCT&nbsp;manufacturer&nbsp;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_drug<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;@DATA(lv_manufacturer).<br />
+<br />
+&nbsp;&nbsp;TRY&nbsp;.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA:&nbsp;o_salv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE&nbsp;REF&nbsp;TO&nbsp;cl_salv_table.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cl_salv_table=&gt;factory(&nbsp;IMPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r_salv_table&nbsp;=&nbsp;o_salv<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CHANGING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t_table&nbsp;=&nbsp;drug_list&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_grid_header)&nbsp;=&nbsp;NEW&nbsp;cl_salv_form_layout_grid(&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_grid_header-&gt;create_header_information(&nbsp;row&nbsp;=&nbsp;1&nbsp;column&nbsp;=&nbsp;1&nbsp;text&nbsp;=&nbsp;'Overal&nbsp;information&nbsp;about&nbsp;drugstore.'&nbsp;&nbsp;).<br />
+<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Groupbox<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_grp_head)&nbsp;=&nbsp;NEW&nbsp;cl_salv_form_groupbox(&nbsp;header&nbsp;=&nbsp;'Warehouse&nbsp;statistics'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_grid_header-&gt;set_element(&nbsp;row&nbsp;=&nbsp;5&nbsp;column&nbsp;=&nbsp;1&nbsp;r_element&nbsp;=&nbsp;o_grp_head&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_grp_head_grid)&nbsp;=&nbsp;o_grp_head-&gt;create_grid(&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_grp_head_grid-&gt;set_grid_lines(&nbsp;if_salv_form_c_grid_lines=&gt;no_lines&nbsp;).<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Labels&nbsp;+&nbsp;Text<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_product_label_1)&nbsp;=&nbsp;o_grp_head_grid-&gt;create_label(&nbsp;row&nbsp;=&nbsp;1&nbsp;column&nbsp;=&nbsp;1&nbsp;text&nbsp;=&nbsp;'Total&nbsp;number&nbsp;of&nbsp;products:'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_product_ext_1)&nbsp;=&nbsp;o_grp_head_grid-&gt;create_text(&nbsp;row&nbsp;=&nbsp;1&nbsp;column&nbsp;=&nbsp;2&nbsp;text&nbsp;=&nbsp;lv_sum&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_product_label_2)&nbsp;=&nbsp;o_grp_head_grid-&gt;create_label(&nbsp;row&nbsp;=&nbsp;2&nbsp;column&nbsp;=&nbsp;1&nbsp;text&nbsp;=&nbsp;'Total&nbsp;number&nbsp;of&nbsp;categories:'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_product_text_2)&nbsp;=&nbsp;o_grp_head_grid-&gt;create_text(&nbsp;row&nbsp;=&nbsp;2&nbsp;column&nbsp;=&nbsp;2&nbsp;text&nbsp;=&nbsp;lv_category&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_product_label_3)&nbsp;=&nbsp;o_grp_head_grid-&gt;create_label(&nbsp;row&nbsp;=&nbsp;3&nbsp;column&nbsp;=&nbsp;1&nbsp;text&nbsp;=&nbsp;'Total&nbsp;number&nbsp;of&nbsp;manufacturers:'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(o_product_text_3)&nbsp;=&nbsp;o_grp_head_grid-&gt;create_text(&nbsp;row&nbsp;=&nbsp;3&nbsp;column&nbsp;=&nbsp;2&nbsp;text&nbsp;=&nbsp;lv_manufacturer&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_salv-&gt;get_functions(&nbsp;)-&gt;set_all(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_salv-&gt;get_columns(&nbsp;)-&gt;set_optimize(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_salv-&gt;get_display_settings(&nbsp;)-&gt;set_list_header('Drugs').<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_salv-&gt;get_display_settings(&nbsp;)-&gt;set_striped_pattern(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_salv-&gt;get_selections(&nbsp;)-&gt;set_selection_mode(&nbsp;if_salv_c_selection_mode=&gt;row_column&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_salv-&gt;set_top_of_list(&nbsp;o_grid_header&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_salv-&gt;display(&nbsp;).<br />
+<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CATCH&nbsp;cx_root&nbsp;INTO&nbsp;DATA(e_text).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE:/&nbsp;e_text-&gt;get_text(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;ENDTRY.<br />
+<br />
+ENDFORM.<br />
+   </div>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Form&nbsp;display_employee_list<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;--&gt;&nbsp;&nbsp;p1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&&nbsp;&lt;--&nbsp;&nbsp;p2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+   </div>
+   <div class="code">
+FORM display_employee_list .<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;b~first_name,&nbsp;b~last_name,&nbsp;a~employee_role,&nbsp;a~phone_number,&nbsp;a~birth_date<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_employee&nbsp;AS&nbsp;a<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;zyuu3_d_employ_t&nbsp;AS&nbsp;b&nbsp;ON&nbsp;a~employee_id&nbsp;=&nbsp;b~employee_id<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;langu&nbsp;=&nbsp;@sy-langu<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@DATA(lt_employee).<br />
+<br />
+&nbsp;&nbsp;TRY.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA&nbsp;o_employee_list&nbsp;TYPE&nbsp;REF&nbsp;TO&nbsp;cl_salv_table.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cl_salv_table=&gt;factory(&nbsp;IMPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r_salv_table&nbsp;=&nbsp;o_employee_list<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CHANGING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t_table&nbsp;=&nbsp;lt_employee&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_employee_list-&gt;get_columns(&nbsp;)-&gt;set_optimize(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_employee_list-&gt;get_display_settings(&nbsp;)-&gt;set_list_header(&nbsp;'Employee&nbsp;list'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_employee_list-&gt;get_display_settings(&nbsp;)-&gt;set_striped_pattern(&nbsp;abap_true&nbsp;).<br />
+<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_employee_list-&gt;display(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CATCH&nbsp;cx_root&nbsp;INTO&nbsp;DATA(e_text).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE:/&nbsp;e_text-&gt;get_text(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;ENDTRY.<br />
+<br />
+<br />
+<br />
+ENDFORM.<br />
+   </div>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Form&nbsp;display_customer_list<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;--&gt;&nbsp;&nbsp;p1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&&nbsp;&lt;--&nbsp;&nbsp;p2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+   </div>
+   <div class="code">
+FORM display_customer_list .<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;id,&nbsp;first_name,&nbsp;last_name,&nbsp;country,&nbsp;city,&nbsp;address,&nbsp;email,&nbsp;birt_date<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_customer<br />
+&nbsp;&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@DATA(lt_customer).<br />
+<br />
+&nbsp;&nbsp;TRY.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA&nbsp;o_customer_list&nbsp;TYPE&nbsp;REF&nbsp;TO&nbsp;cl_salv_table.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cl_salv_table=&gt;factory(&nbsp;IMPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r_salv_table&nbsp;=&nbsp;o_customer_list<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CHANGING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t_table&nbsp;=&nbsp;lt_customer&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_customer_list-&gt;get_columns(&nbsp;)-&gt;set_optimize(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_customer_list-&gt;get_display_settings(&nbsp;)-&gt;set_list_header(&nbsp;'Customer&nbsp;list'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_customer_list-&gt;get_display_settings(&nbsp;)-&gt;set_striped_pattern(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_customer_list-&gt;get_functions(&nbsp;)-&gt;set_all(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_customer_list-&gt;get_selections(&nbsp;)-&gt;set_selection_mode(&nbsp;if_salv_c_selection_mode=&gt;row_column&nbsp;).<br />
+<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_customer_list-&gt;display(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CATCH&nbsp;cx_root&nbsp;INTO&nbsp;DATA(e_text).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE:/&nbsp;e_text-&gt;get_text(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;ENDTRY.<br />
+<br />
+ENDFORM.<br />
+   </div>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Form&nbsp;display_feedback_list<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;--&gt;&nbsp;&nbsp;p1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&&nbsp;&lt;--&nbsp;&nbsp;p2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+   </div>
+   <div class="code">
+FORM display_feedback_list .<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;f~id,&nbsp;c~first_name,&nbsp;c~last_name,&nbsp;d~drug_name,&nbsp;f~text<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_feedback&nbsp;AS&nbsp;f<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;zyuu3_d_drug&nbsp;AS&nbsp;d&nbsp;ON&nbsp;f~drug_id&nbsp;=&nbsp;d~drug_id<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;zyuu3_d_customer&nbsp;AS&nbsp;c&nbsp;ON&nbsp;f~customer_id&nbsp;=&nbsp;c~id<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@DATA(lt_feedback).<br />
+<br />
+&nbsp;&nbsp;TRY.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA&nbsp;o_feedback&nbsp;TYPE&nbsp;REF&nbsp;TO&nbsp;cl_salv_table.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cl_salv_table=&gt;factory(&nbsp;IMPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r_salv_table&nbsp;=&nbsp;o_feedback<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CHANGING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t_table&nbsp;=&nbsp;lt_feedback&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_feedback-&gt;get_columns(&nbsp;)-&gt;set_optimize(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_feedback-&gt;get_display_settings(&nbsp;)-&gt;set_list_header(&nbsp;'Feedbacks'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_feedback-&gt;get_display_settings(&nbsp;)-&gt;set_striped_pattern(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_feedback-&gt;get_functions(&nbsp;)-&gt;set_all(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_feedback-&gt;display(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CATCH&nbsp;cx_root&nbsp;INTO&nbsp;DATA(e_text).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE:/&nbsp;e_text-&gt;get_text(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;ENDTRY.<br />
+<br />
+<br />
+<br />
+ENDFORM.<br />
+   </div>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Form&nbsp;display_yearly_orders<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;--&gt;&nbsp;&nbsp;p1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&&nbsp;&lt;--&nbsp;&nbsp;p2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+   </div>
+   <div class="code">
+FORM display_yearly_orders .<br />
+&nbsp;&nbsp;CONCATENATE&nbsp;sy-datum(4)&nbsp;'0101'&nbsp;INTO&nbsp;my_date.<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;o~id,&nbsp;o~order_date,&nbsp;o~payment_amount,&nbsp;o~payment_status,&nbsp;c~first_name,&nbsp;c~last_name<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order&nbsp;AS&nbsp;o<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;zyuu3_d_customer&nbsp;AS&nbsp;c&nbsp;ON&nbsp;o~customer_id&nbsp;=&nbsp;c~id<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;o~order_date&nbsp;&gt;=&nbsp;@my_date&nbsp;AND&nbsp;o~order_date&nbsp;&lt;=&nbsp;@sy-datum<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ORDER&nbsp;BY&nbsp;o~order_date<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@DATA(lt_yearly_orders).<br />
+<br />
+&nbsp;&nbsp;TRY.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA&nbsp;o_yearly_orders&nbsp;TYPE&nbsp;REF&nbsp;TO&nbsp;cl_salv_table.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cl_salv_table=&gt;factory(&nbsp;IMPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r_salv_table&nbsp;=&nbsp;o_yearly_orders<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CHANGING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t_table&nbsp;=&nbsp;lt_yearly_orders&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(displayed_date)&nbsp;=&nbsp;|from&nbsp;{&nbsp;my_date+6(2)&nbsp;}.{&nbsp;my_date+4(2)&nbsp;}.{&nbsp;my_date(4)&nbsp;}&nbsp;to&nbsp;{&nbsp;sy-datum+6(2)&nbsp;}.{&nbsp;sy-datum+4(2)&nbsp;}.{&nbsp;sy-datum(4)&nbsp;}&nbsp;|.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_yearly_orders-&gt;get_columns(&nbsp;)-&gt;set_optimize(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_yearly_orders-&gt;get_display_settings(&nbsp;)-&gt;set_list_header(&nbsp;|Created&nbsp;orders&nbsp;{&nbsp;displayed_date&nbsp;}|&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_yearly_orders-&gt;display(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CATCH&nbsp;cx_root&nbsp;INTO&nbsp;DATA(e_text).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE:/&nbsp;e_text-&gt;get_text(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;ENDTRY.<br />
+&nbsp;&nbsp;CLEAR&nbsp;my_date.<br />
+ENDFORM.<br />
+   </div>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Form&nbsp;display_last_month_orders<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;--&gt;&nbsp;&nbsp;p1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&&nbsp;&lt;--&nbsp;&nbsp;p2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+   </div>
+   <div class="code">
+FORM display_last_month_orders.<br />
+<br />
+&nbsp;&nbsp;CONCATENATE&nbsp;sy-datum(4)&nbsp;sy-datum+4(2)&nbsp;'01'&nbsp;INTO&nbsp;my_date.<br />
+&nbsp;&nbsp;to_date&nbsp;=&nbsp;my_date&nbsp;-&nbsp;1.<br />
+&nbsp;&nbsp;CONCATENATE&nbsp;to_date(4)&nbsp;to_date+4(2)&nbsp;'01'&nbsp;INTO&nbsp;from_date.<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;o~id,&nbsp;o~order_date,&nbsp;o~payment_amount,&nbsp;o~payment_status,&nbsp;c~first_name,&nbsp;c~last_name<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order&nbsp;AS&nbsp;o<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;zyuu3_d_customer&nbsp;AS&nbsp;c&nbsp;ON&nbsp;o~customer_id&nbsp;=&nbsp;c~id<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;o~order_date&nbsp;&gt;=&nbsp;@from_date&nbsp;AND&nbsp;o~order_date&nbsp;&lt;=&nbsp;@to_date<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ORDER&nbsp;BY&nbsp;o~order_date<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@DATA(lt_last_month_orders).<br />
+<br />
+&nbsp;&nbsp;TRY.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA&nbsp;o_last_month_orders&nbsp;TYPE&nbsp;REF&nbsp;TO&nbsp;cl_salv_table.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cl_salv_table=&gt;factory(&nbsp;IMPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r_salv_table&nbsp;=&nbsp;o_last_month_orders<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CHANGING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t_table&nbsp;=&nbsp;lt_last_month_orders&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_last_month_orders-&gt;get_columns(&nbsp;)-&gt;set_optimize(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_last_month_orders-&gt;get_display_settings(&nbsp;)-&gt;set_list_header(&nbsp;|Last&nbsp;month&nbsp;orders|&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_last_month_orders-&gt;display(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CATCH&nbsp;cx_root&nbsp;INTO&nbsp;DATA(e_text).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE:/&nbsp;e_text-&gt;get_text(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;ENDTRY.<br />
+<br />
+&nbsp;&nbsp;CLEAR&nbsp;my_date.<br />
+&nbsp;&nbsp;CLEAR&nbsp;from_date.<br />
+&nbsp;&nbsp;CLEAR&nbsp;to_date.<br />
+<br />
+<br />
+ENDFORM.<br />
+   </div>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Form&nbsp;display_this_month_orders<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;--&gt;&nbsp;&nbsp;p1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&&nbsp;&lt;--&nbsp;&nbsp;p2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+   </div>
+   <div class="code">
+FORM display_this_month_orders .<br />
+<br />
+&nbsp;&nbsp;CONCATENATE&nbsp;sy-datum(4)&nbsp;sy-datum+4(2)&nbsp;'01'&nbsp;INTO&nbsp;from_date.<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;o~id,&nbsp;o~order_date,&nbsp;o~payment_amount,&nbsp;o~payment_status,&nbsp;c~first_name,&nbsp;c~last_name<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order&nbsp;AS&nbsp;o<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;zyuu3_d_customer&nbsp;AS&nbsp;c&nbsp;ON&nbsp;o~customer_id&nbsp;=&nbsp;c~id<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;o~order_date&nbsp;&gt;=&nbsp;@from_date&nbsp;AND&nbsp;o~order_date&nbsp;&lt;=&nbsp;@sy-datum<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ORDER&nbsp;BY&nbsp;o~order_date<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@DATA(lt_this_month_orders).<br />
+<br />
+&nbsp;&nbsp;TRY.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA&nbsp;o_this_month_orders&nbsp;TYPE&nbsp;REF&nbsp;TO&nbsp;cl_salv_table.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cl_salv_table=&gt;factory(&nbsp;IMPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r_salv_table&nbsp;=&nbsp;o_this_month_orders<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CHANGING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t_table&nbsp;=&nbsp;lt_this_month_orders&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_this_month_orders-&gt;get_columns(&nbsp;)-&gt;set_optimize(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_this_month_orders-&gt;get_display_settings(&nbsp;)-&gt;set_list_header(&nbsp;'This&nbsp;month&nbsp;orders'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_this_month_orders-&gt;display(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CATCH&nbsp;cx_root&nbsp;INTO&nbsp;DATA(e_text).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE:/&nbsp;e_text-&gt;get_text(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;ENDTRY.<br />
+<br />
+&nbsp;&nbsp;CLEAR&nbsp;my_date.<br />
+&nbsp;&nbsp;CLEAR&nbsp;from_date.<br />
+&nbsp;&nbsp;CLEAR&nbsp;to_date.<br />
+<br />
+ENDFORM.<br />
+   </div>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Form&nbsp;display_last_7_days_orders<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;--&gt;&nbsp;&nbsp;p1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&&nbsp;&lt;--&nbsp;&nbsp;p2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+   </div>
+   <div class="code">
+FORM display_last_7_days_orders .<br />
+<br />
+&nbsp;&nbsp;from_date&nbsp;=&nbsp;sy-datum&nbsp;-&nbsp;7.<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;o~id,&nbsp;o~order_date,&nbsp;o~payment_amount,&nbsp;o~payment_status,&nbsp;c~first_name,&nbsp;c~last_name<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order&nbsp;AS&nbsp;o<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;zyuu3_d_customer&nbsp;AS&nbsp;c&nbsp;ON&nbsp;o~customer_id&nbsp;=&nbsp;c~id<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;o~order_date&nbsp;&gt;=&nbsp;@from_date&nbsp;AND&nbsp;o~order_date&nbsp;&lt;=&nbsp;@sy-datum<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ORDER&nbsp;BY&nbsp;o~order_date<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@DATA(lt_last_7_days_orders).<br />
+<br />
+&nbsp;&nbsp;TRY.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA&nbsp;o_last_7_days_orders&nbsp;TYPE&nbsp;REF&nbsp;TO&nbsp;cl_salv_table.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cl_salv_table=&gt;factory(&nbsp;IMPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r_salv_table&nbsp;=&nbsp;o_last_7_days_orders<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CHANGING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t_table&nbsp;=&nbsp;lt_last_7_days_orders&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_last_7_days_orders-&gt;get_columns(&nbsp;)-&gt;set_optimize(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_last_7_days_orders-&gt;get_display_settings(&nbsp;)-&gt;set_list_header(&nbsp;'Last&nbsp;7&nbsp;days&nbsp;orders'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_last_7_days_orders-&gt;display(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CATCH&nbsp;cx_root&nbsp;INTO&nbsp;DATA(e_text).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE:/&nbsp;e_text-&gt;get_text(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;ENDTRY.<br />
+<br />
+&nbsp;&nbsp;CLEAR&nbsp;my_date.<br />
+&nbsp;&nbsp;CLEAR&nbsp;from_date.<br />
+&nbsp;&nbsp;CLEAR&nbsp;to_date.<br />
+<br />
+ENDFORM.<br />
+   </div>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Form&nbsp;display_top_customers<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;--&gt;&nbsp;&nbsp;p1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&&nbsp;&lt;--&nbsp;&nbsp;p2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+   </div>
+   <div class="code">
+FORM display_top_customers .<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;c~first_name,&nbsp;c~last_name,&nbsp;c~gender,&nbsp;c~email,&nbsp;t~landx,&nbsp;COUNT(&nbsp;o~id&nbsp;)&nbsp;AS&nbsp;order_count,&nbsp;SUM(&nbsp;o~payment_amount&nbsp;)&nbsp;AS&nbsp;order_amount<br />
+&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order&nbsp;AS&nbsp;o<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;zyuu3_d_customer&nbsp;AS&nbsp;c&nbsp;ON&nbsp;c~id&nbsp;=&nbsp;o~customer_id<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;zyuu3_d_feedback&nbsp;AS&nbsp;f&nbsp;ON&nbsp;o~customer_id&nbsp;=&nbsp;f~customer_id<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;t005t&nbsp;AS&nbsp;t&nbsp;ON&nbsp;c~country&nbsp;=&nbsp;t~land1<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;o~payment_status&nbsp;=&nbsp;'COMPLETE'&nbsp;AND&nbsp;t~spras&nbsp;=&nbsp;'E'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GROUP&nbsp;BY&nbsp;c~first_name,&nbsp;c~last_name,&nbsp;c~gender,&nbsp;c~email,&nbsp;t~landx<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ORDER&nbsp;BY&nbsp;order_amount&nbsp;DESCENDING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@DATA(lt_top5)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;UP&nbsp;TO&nbsp;5&nbsp;ROWS.<br />
+<br />
+&nbsp;&nbsp;TRY.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA&nbsp;o_top5&nbsp;TYPE&nbsp;REF&nbsp;TO&nbsp;cl_salv_table.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cl_salv_table=&gt;factory(&nbsp;IMPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r_salv_table&nbsp;=&nbsp;o_top5<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CHANGING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t_table&nbsp;=&nbsp;lt_top5&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_top5-&gt;get_columns(&nbsp;)-&gt;set_optimize(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_top5-&gt;get_display_settings(&nbsp;)-&gt;set_list_header(&nbsp;'Top&nbsp;5&nbsp;customers'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_top5-&gt;display(&nbsp;).<br />
+<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CATCH&nbsp;cx_root&nbsp;INTO&nbsp;DATA(e_text).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE:/&nbsp;e_text-&gt;get_text(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;ENDTRY.<br />
+<br />
+ENDFORM.<br />
+   </div>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Form&nbsp;display_bottom_customers<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;--&gt;&nbsp;&nbsp;p1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&&nbsp;&lt;--&nbsp;&nbsp;p2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+   </div>
+   <div class="code">
+FORM display_bottom_customers .<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;c~first_name,&nbsp;c~last_name,&nbsp;c~gender,&nbsp;c~email,&nbsp;t~landx,&nbsp;COUNT(&nbsp;o~id&nbsp;)&nbsp;AS&nbsp;order_count,&nbsp;SUM(&nbsp;o~payment_amount&nbsp;)&nbsp;AS&nbsp;order_amount<br />
+&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order&nbsp;AS&nbsp;o<br />
+&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;zyuu3_d_customer&nbsp;AS&nbsp;c&nbsp;ON&nbsp;c~id&nbsp;=&nbsp;o~customer_id<br />
+&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;zyuu3_d_feedback&nbsp;AS&nbsp;f&nbsp;ON&nbsp;o~customer_id&nbsp;=&nbsp;f~customer_id<br />
+&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;t005t&nbsp;AS&nbsp;t&nbsp;ON&nbsp;c~country&nbsp;=&nbsp;t~land1<br />
+&nbsp;&nbsp;WHERE&nbsp;o~payment_status&nbsp;=&nbsp;'COMPLETE'&nbsp;AND&nbsp;t~spras&nbsp;=&nbsp;'E'<br />
+&nbsp;&nbsp;GROUP&nbsp;BY&nbsp;c~first_name,&nbsp;c~last_name,&nbsp;c~gender,&nbsp;c~email,&nbsp;t~landx<br />
+&nbsp;&nbsp;ORDER&nbsp;BY&nbsp;order_amount&nbsp;ASCENDING<br />
+&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@DATA(lt_bottom5)<br />
+&nbsp;&nbsp;UP&nbsp;TO&nbsp;5&nbsp;ROWS.<br />
+<br />
+&nbsp;&nbsp;TRY.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA&nbsp;o_bottom5&nbsp;TYPE&nbsp;REF&nbsp;TO&nbsp;cl_salv_table.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cl_salv_table=&gt;factory(&nbsp;IMPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r_salv_table&nbsp;=&nbsp;o_bottom5<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CHANGING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t_table&nbsp;=&nbsp;lt_bottom5&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_bottom5-&gt;get_columns(&nbsp;)-&gt;set_optimize(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_bottom5-&gt;get_display_settings(&nbsp;)-&gt;set_list_header(&nbsp;'Bottom&nbsp;5&nbsp;customers'&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_bottom5-&gt;display(&nbsp;).<br />
+<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CATCH&nbsp;cx_root&nbsp;INTO&nbsp;DATA(e_text).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE:/&nbsp;e_text-&gt;get_text(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;ENDTRY.<br />
+<br />
+ENDFORM.<br />
+   </div>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Form&nbsp;display_customer<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;--&gt;&nbsp;&nbsp;p1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&&nbsp;&lt;--&nbsp;&nbsp;p2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+   </div>
+   <div class="code">
+FORM display_customer .<br />
+<br />
+&nbsp;&nbsp;CASE&nbsp;abap_true.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;male_rb.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;*<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_customer<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;gender&nbsp;=&nbsp;'M'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AND&nbsp;birt_date&nbsp;BETWEEN&nbsp;@f_date&nbsp;AND&nbsp;@t_date<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OR&nbsp;country&nbsp;=&nbsp;@country<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@DATA(lt_selected_customers).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;female_rb.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;*<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_customer<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;gender&nbsp;=&nbsp;'F'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AND&nbsp;birt_date&nbsp;BETWEEN&nbsp;@f_date&nbsp;AND&nbsp;@t_date<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OR&nbsp;country&nbsp;=&nbsp;@country<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@lt_selected_customers.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;OTHERS.<br />
+<br />
+&nbsp;&nbsp;ENDCASE.<br />
+<br />
+&nbsp;&nbsp;TRY.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cl_salv_table=&gt;factory(&nbsp;IMPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r_salv_table&nbsp;=&nbsp;DATA(o_selected_customers)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CHANGING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t_table&nbsp;=&nbsp;lt_selected_customers&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_selected_customers-&gt;display(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CATCH&nbsp;&nbsp;cx_root&nbsp;INTO&nbsp;DATA(e_text).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE:/&nbsp;e_text-&gt;get_text(&nbsp;).<br />
+&nbsp;&nbsp;ENDTRY.<br />
+<br />
+ENDFORM.<br />
+   </div>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Form&nbsp;display_order<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;--&gt;&nbsp;&nbsp;p1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&&nbsp;&lt;--&nbsp;&nbsp;p2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text<br />
+*&---------------------------------------------------------------------*<br />
+   </div>
+   <div class="code">
+FORM display_order .<br />
+<br />
+&nbsp;&nbsp;CASE&nbsp;abap_true.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;completed.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;*<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;payment_status&nbsp;=&nbsp;'COMPLETE'&nbsp;AND<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;order_date&nbsp;&gt;=&nbsp;@from_date&nbsp;&nbsp;AND<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;order_date&nbsp;&lt;=&nbsp;@to_date<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@DATA(lt_selected_orders).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;pending.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;*<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;payment_status&nbsp;=&nbsp;'PENDING'&nbsp;AND<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;order_date&nbsp;&gt;=&nbsp;@from_date&nbsp;&nbsp;AND<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;order_date&nbsp;&lt;=&nbsp;@to_date<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@lt_selected_orders.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;failed.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;*<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;zyuu3_d_order<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;payment_status&nbsp;=&nbsp;'FAILED'&nbsp;AND<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;order_date&nbsp;&gt;=&nbsp;@from_date&nbsp;&nbsp;AND<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;order_date&nbsp;&lt;=&nbsp;@to_date<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;TABLE&nbsp;@lt_selected_orders.<br />
+<br />
+&nbsp;&nbsp;ENDCASE.<br />
+<br />
+&nbsp;&nbsp;TRY.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cl_salv_table=&gt;factory(&nbsp;IMPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r_salv_table&nbsp;=&nbsp;DATA(o_selected_orders)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CHANGING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t_table&nbsp;=&nbsp;lt_selected_orders&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DATA(displayed_date)&nbsp;=&nbsp;|{&nbsp;from_date+6(2)&nbsp;}.{&nbsp;from_date+4(2)&nbsp;}.{&nbsp;from_date(4)&nbsp;}&nbsp;to&nbsp;{&nbsp;to_date+6(2)&nbsp;}.{&nbsp;to_date+4(2)&nbsp;}.{&nbsp;to_date(4)&nbsp;}|.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_selected_orders-&gt;get_columns(&nbsp;)-&gt;set_optimize(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_selected_orders-&gt;get_display_settings(&nbsp;)-&gt;set_striped_pattern(&nbsp;abap_true&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_selected_orders-&gt;get_display_settings(&nbsp;)-&gt;set_list_header(&nbsp;|Created&nbsp;orders&nbsp;from&nbsp;{&nbsp;displayed_date&nbsp;}&nbsp;|&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o_selected_orders-&gt;display(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CATCH&nbsp;&nbsp;cx_root&nbsp;INTO&nbsp;DATA(e_text).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE:/&nbsp;e_text-&gt;get_text(&nbsp;).<br />
+<br />
+&nbsp;&nbsp;ENDTRY.<br />
+<br />
+ENDFORM.<br />
+            </div>
+          </td>
+        </tr>
+      </table>
+      </td>
+      </tr>
+   <tr>
+<td class="footer">Extracted by Mass Download version 1.5.5 - E.G.Mellodew. 1998-2023. Sap Release 756</td>
+   </tr>
+</table>
+</body>
+</html>
