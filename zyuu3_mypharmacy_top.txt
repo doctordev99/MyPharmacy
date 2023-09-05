@@ -1,0 +1,41 @@
+*&---------------------------------------------------------------------*
+*& Include ZYUU3_MYPHARMACY_TOP                     - Report ZYUU3_R_MYPHARMACY
+*&---------------------------------------------------------------------*
+REPORT zyuu3_r_mypharmacy.
+
+TABLES: t005t.
+
+DATA: gv_ucomm_0100 TYPE sy-ucomm.
+DATA top_products TYPE c LENGTH 50.
+
+DATA : from_date TYPE sy-datum,
+       to_date   TYPE sy-datum,
+       my_date   TYPE sy-datum,
+       f_date    TYPE sy-datum,
+       t_date    TYPE sy-datum.
+
+DATA: male_rb   TYPE flag VALUE 'X',
+      female_rb TYPE flag,
+      country   TYPE t005t-landx.
+
+DATA: completed TYPE flag VALUE 'X',
+      pending   TYPE flag,
+      failed    TYPE flag.
+
+
+DATA add_info TYPE xfeld.
+
+TYPES: BEGIN OF str_product,
+         id           LIKE zyuu3_d_drug-drug_id,
+         name         LIKE zyuu3_d_drug-drug_name,
+         manufacturer LIKE zyuu3_d_drug-manufacturer,
+         category     LIKE zyuu3_d_drug-category,
+         man_date     LIKE zyuu3_d_drug-manufactured_date,
+         ex_date      LIKE zyuu3_d_drug-expire_date,
+       END OF str_product.
+
+DATA str_product TYPE str_product.
+DATA id LIKE zyuu3_d_drug-drug_id.
+
+----------------------------------------------------------------------------------
+Extracted by Mass Download version 1.5.5 - E.G.Mellodew. 1998-2023. Sap Release 756

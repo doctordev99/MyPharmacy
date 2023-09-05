@@ -1,0 +1,100 @@
+*&---------------------------------------------------------------------*
+*& Include          ZYUU3_MYPHARMACY_O01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*& Module STATUS_0100 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE status_0100 OUTPUT.
+  SET PF-STATUS '0100'.
+  SET TITLEBAR '0100'.
+
+  LOOP AT SCREEN.
+        IF screen-group1 = 'GR1' AND add_info <> abap_true.
+          screen-active = '0'.
+          MODIFY SCREEN.
+        ELSEIF screen-group1 = 'GR1' AND add_info = abap_true.
+          screen-active = '1'.
+          MODIFY SCREEN.
+        ENDIF.
+
+      ENDLOOP.
+
+* Displaying statistic data to screen 0100
+  SELECT COUNT( * )
+    FROM zyuu3_d_drug
+    INTO @DATA(product_count).
+
+  SELECT COUNT( * )
+    FROM zyuu3_d_order
+    INTO @DATA(order_count).
+
+  SELECT COUNT( * )
+    FROM ZYUU3_D_customer
+    INTO @DATA(customer_count).
+
+  SELECT COUNT( * )
+    FROM ZYUU3_D_customer
+    WHERE gender = 'M'
+    INTO @DATA(male_count).
+
+  SELECT COUNT( * )
+    FROM ZYUU3_D_customer
+    WHERE gender = 'F'
+    INTO @DATA(female_count).
+
+  SELECT d~drug_name, COUNT( o~id ) AS drug_count
+    FROM zyuu3_d_order_it AS o
+    INNER JOIN zyuu3_d_drug AS d ON d~drug_id = o~drug_id
+    GROUP BY d~drug_name
+    ORDER BY drug_count DESCENDING
+    INTO TABLE @DATA(top_products_list)
+    UP TO 3 ROWS.
+
+  LOOP AT top_products_list INTO DATA(wa_product).
+    CONCATENATE wa_product-drug_name ' ' top_products INTO top_products SEPARATED BY space.
+  ENDLOOP.
+
+*  Set dropdown list
+*  DATA: g_name TYPE vrm_id,
+*        g_list  TYPE vrm_values,
+*        g_value LIKE LINE OF g_list.
+*
+*  CLEAR: g_value, g_list.
+*  g_value-key = '1'.
+*  g_value-text = '18-24'.
+*  APPEND g_value TO g_list.
+*
+*  g_value-key = '2'.
+*  g_value-text = '25-34'.
+*  APPEND g_value TO g_list.
+*
+*  g_value-key = '3'.
+*  g_value-text = '35-44'.
+*  APPEND g_value TO g_list.
+*
+*  g_value-key = '4'.
+*  g_value-text = '45-54'.
+*  APPEND g_value TO g_list.
+*
+*  g_value-key = '5'.
+*  g_value-text = '55-64'.
+*  APPEND g_value TO g_list.
+*
+*  g_value-key = '6'.
+*  g_value-text = '65+'.
+*  APPEND g_value TO g_list.
+*
+*
+*    CALL FUNCTION 'VRM_SET_VALUES'
+*      EXPORTING
+*        id     = 'AGE'
+*        values = g_list.
+
+
+
+ENDMODULE.
+
+----------------------------------------------------------------------------------
+Extracted by Mass Download version 1.5.5 - E.G.Mellodew. 1998-2023. Sap Release 756

@@ -1,0 +1,30 @@
+*&---------------------------------------------------------------------*
+*& Report ZYUU3_R_MYPHARMACY
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+
+INCLUDE zyuu3_mypharmacy_top                    .  " Global Data
+*INCLUDE zyuu3_mypharmacy_sel                    .  " Selection screen
+INCLUDE zyuu3_mypharmacy_o01                    .  " PBO-Modules
+INCLUDE zyuu3_mypharmacy_i01                    .  " PAI-Modules
+INCLUDE zyuu3_mypharmacy_f01                    .  " FORM-Routines
+
+START-OF-SELECTION.
+
+  CALL SCREEN 0100.
+
+*GUI Texts
+*----------------------------------------------------------
+* 0100 --> #MyPharmacy#
+* 0100 --> #MyPharmacy#
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: Hard coded
+*   Data not found
+
+----------------------------------------------------------------------------------
+Extracted by Mass Download version 1.5.5 - E.G.Mellodew. 1998-2023. Sap Release 756

@@ -1,0 +1,634 @@
+*&---------------------------------------------------------------------*
+*& Include          ZYUU3_MYPHARMACY_F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*& Form display_order_list
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display_order_list .
+
+* Displaying data
+  SELECT o~id, o~order_date, c~first_name, c~last_name, o~payment_mode, o~payment_amount, o~payment_status
+    FROM zyuu3_d_order AS o
+    INNER JOIN zyuu3_d_customer AS c ON c~id = o~customer_id
+    INTO TABLE @DATA(it_order_list).
+
+
+  SELECT COUNT( id )
+    FROM zyuu3_d_order
+    INTO @DATA(lv_order_count).
+
+  SELECT COUNT( payment_amount )
+    FROM zyuu3_d_order
+    WHERE payment_status = 'COMPLETE'
+    INTO @DATA(lv_completed_orders).
+
+  SELECT COUNT( payment_amount )
+   FROM zyuu3_d_order
+   WHERE payment_status = 'FAILED'
+   INTO @DATA(lv_failed_orders).
+
+  SELECT SUM( payment_amount )
+    FROM zyuu3_d_order
+    INTO @DATA(lv_total_amount).
+
+  SELECT SUM( payment_amount )
+   FROM zyuu3_d_order
+   WHERE payment_status = 'COMPLETE'
+   INTO @DATA(lv_completed_orders_amount).
+
+  SELECT SUM( payment_amount )
+    FROM zyuu3_d_order
+    WHERE payment_status = 'FAILED'
+    INTO @DATA(lv_failed_orders_amount).
+
+  TRY.
+
+      DATA: o_order_list TYPE REF TO cl_salv_table.
+
+
+      cl_salv_table=>factory( IMPORTING
+                                     r_salv_table = o_order_list
+                                  CHANGING
+                                     t_table = it_order_list ).
+
+
+      DATA(o_order_header) = NEW cl_salv_form_layout_grid( ).
+      o_order_header->create_header_information( row = 1 column = 1 text = 'Overal information about created orders.' ).
+
+*        Groupbox for General statistics
+      DATA(o_grp_order) = NEW cl_salv_form_groupbox( header = 'General statistics' ).
+      o_order_header->set_element( row = 5 column = 1 r_element = o_grp_order ).
+
+      DATA(o_grp_order_grid) = o_grp_order->create_grid( ).
+      o_grp_order_grid->set_grid_lines( if_salv_form_c_grid_lines=>no_lines ).
+
+*        Labels + Text
+      DATA(o_label_1) = o_grp_order_grid->create_label( row = 1 column = 1 text = 'Total number of orders:' ).
+      DATA(o_text_1) = o_grp_order_grid->create_text( row = 1 column = 2 text = lv_order_count ).
+      DATA(o_label_2) = o_grp_order_grid->create_label( row = 2 column = 1 text = 'Completed orders:' ).
+      DATA(o_text_2) = o_grp_order_grid->create_text( row = 2 column = 2 text = lv_completed_orders ).
+      DATA(o_label_3) = o_grp_order_grid->create_label( row = 3 column = 1 text = 'Failed orders:' ).
+      DATA(o_text_3) = o_grp_order_grid->create_text( row = 3 column = 2 text = lv_failed_orders ).
+
+*        Groupbox for Financial statistics
+      DATA(o_grp_order2) = NEW cl_salv_form_groupbox( header = 'Financial statistics' ).
+      o_order_header->set_element( row = 5 column = 2 r_element = o_grp_order2 ).
+
+      DATA(o_grp_order_grid2) = o_grp_order2->create_grid( ).
+      o_grp_order_grid2->set_grid_lines( if_salv_form_c_grid_lines=>no_lines ).
+
+*        Labels + Text
+      o_label_1 = o_grp_order_grid2->create_label( row = 1 column = 1 text = 'Total amount of orders:' ).
+      o_text_1 = o_grp_order_grid2->create_text( row = 1 column = 2 text = lv_total_amount ).
+      o_label_2 = o_grp_order_grid2->create_label( row = 2 column = 1 text = 'Completed orders amount:' ).
+      o_text_2 = o_grp_order_grid2->create_text( row = 2 column = 2 text = lv_completed_orders_amount ).
+      o_label_3 = o_grp_order_grid2->create_label( row = 3 column = 1 text = 'Failed orders amount:' ).
+      o_text_3 = o_grp_order_grid2->create_text( row = 3 column = 2 text = lv_failed_orders_amount ).
+
+      o_order_list->get_functions( )->set_all( abap_true ).
+      o_order_list->get_columns( )->set_optimize( abap_true ).
+      o_order_list->get_display_settings( )->set_list_header('Order list').
+      o_order_list->get_display_settings( )->set_striped_pattern( abap_true ).
+      o_order_list->get_selections( )->set_selection_mode( if_salv_c_selection_mode=>row_column ).
+
+
+
+      o_order_list->set_top_of_list( o_order_header ).
+      o_order_list->display( ).
+
+    CATCH cx_root INTO DATA(e_text).
+      WRITE:/ e_text->get_text( ).
+
+  ENDTRY.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form display_product_list
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display_product_list .
+
+  SELECT d~drug_id, d~drug_name, d~manufactured_date, d~expire_date, i~quantity, i~price, d~manufacturer, d~category
+        FROM zyuu3_d_drug AS d
+        INNER JOIN zyuu3_d_inventor AS i ON  d~drug_id = i~drug_id
+        INTO TABLE @DATA(drug_list).
+
+  SELECT SUM( quantity )
+    FROM zyuu3_d_inventor
+    INTO @DATA(lv_sum).
+
+  SELECT COUNT( DISTINCT category )
+    FROM zyuu3_d_drug
+    INTO @DATA(lv_category).
+
+  SELECT COUNT( DISTINCT manufacturer )
+    FROM zyuu3_d_drug
+    INTO @DATA(lv_manufacturer).
+
+  TRY .
+      DATA: o_salv       TYPE REF TO cl_salv_table.
+
+      cl_salv_table=>factory( IMPORTING
+                                 r_salv_table = o_salv
+                              CHANGING
+                                 t_table = drug_list ).
+
+      DATA(o_grid_header) = NEW cl_salv_form_layout_grid( ).
+      o_grid_header->create_header_information( row = 1 column = 1 text = 'Overal information about drugstore.'  ).
+
+*        Groupbox
+      DATA(o_grp_head) = NEW cl_salv_form_groupbox( header = 'Warehouse statistics' ).
+      o_grid_header->set_element( row = 5 column = 1 r_element = o_grp_head ).
+
+      DATA(o_grp_head_grid) = o_grp_head->create_grid( ).
+      o_grp_head_grid->set_grid_lines( if_salv_form_c_grid_lines=>no_lines ).
+*        Labels + Text
+      DATA(o_product_label_1) = o_grp_head_grid->create_label( row = 1 column = 1 text = 'Total number of products:' ).
+      DATA(o_product_ext_1) = o_grp_head_grid->create_text( row = 1 column = 2 text = lv_sum ).
+      DATA(o_product_label_2) = o_grp_head_grid->create_label( row = 2 column = 1 text = 'Total number of categories:' ).
+      DATA(o_product_text_2) = o_grp_head_grid->create_text( row = 2 column = 2 text = lv_category ).
+      DATA(o_product_label_3) = o_grp_head_grid->create_label( row = 3 column = 1 text = 'Total number of manufacturers:' ).
+      DATA(o_product_text_3) = o_grp_head_grid->create_text( row = 3 column = 2 text = lv_manufacturer ).
+
+      o_salv->get_functions( )->set_all( abap_true ).
+      o_salv->get_columns( )->set_optimize( abap_true ).
+      o_salv->get_display_settings( )->set_list_header('Drugs').
+      o_salv->get_display_settings( )->set_striped_pattern( abap_true ).
+      o_salv->get_selections( )->set_selection_mode( if_salv_c_selection_mode=>row_column ).
+
+      o_salv->set_top_of_list( o_grid_header ).
+      o_salv->display( ).
+
+
+    CATCH cx_root INTO DATA(e_text).
+      WRITE:/ e_text->get_text( ).
+
+  ENDTRY.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form display_employee_list
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display_employee_list .
+
+  SELECT b~first_name, b~last_name, a~employee_role, a~phone_number, a~birth_date
+    FROM zyuu3_d_employee AS a
+    INNER JOIN zyuu3_d_employ_t AS b ON a~employee_id = b~employee_id
+    WHERE langu = @sy-langu
+    INTO TABLE @DATA(lt_employee).
+
+  TRY.
+
+      DATA o_employee_list TYPE REF TO cl_salv_table.
+
+      cl_salv_table=>factory( IMPORTING
+                                r_salv_table = o_employee_list
+                              CHANGING
+                                t_table = lt_employee ).
+      o_employee_list->get_columns( )->set_optimize( abap_true ).
+      o_employee_list->get_display_settings( )->set_list_header( 'Employee list' ).
+      o_employee_list->get_display_settings( )->set_striped_pattern( abap_true ).
+
+
+      o_employee_list->display( ).
+
+    CATCH cx_root INTO DATA(e_text).
+      WRITE:/ e_text->get_text( ).
+
+  ENDTRY.
+
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form display_customer_list
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display_customer_list .
+
+  SELECT id, first_name, last_name, country, city, address, email, birt_date
+    FROM zyuu3_d_customer
+   INTO TABLE @DATA(lt_customer).
+
+  TRY.
+      DATA o_customer_list TYPE REF TO cl_salv_table.
+
+      cl_salv_table=>factory( IMPORTING
+                                r_salv_table = o_customer_list
+                              CHANGING
+                                t_table = lt_customer ).
+      o_customer_list->get_columns( )->set_optimize( abap_true ).
+      o_customer_list->get_display_settings( )->set_list_header( 'Customer list' ).
+      o_customer_list->get_display_settings( )->set_striped_pattern( abap_true ).
+      o_customer_list->get_functions( )->set_all( abap_true ).
+      o_customer_list->get_selections( )->set_selection_mode( if_salv_c_selection_mode=>row_column ).
+
+
+      o_customer_list->display( ).
+
+    CATCH cx_root INTO DATA(e_text).
+      WRITE:/ e_text->get_text( ).
+
+  ENDTRY.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form display_feedback_list
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display_feedback_list .
+
+  SELECT f~id, c~first_name, c~last_name, d~drug_name, f~text
+    FROM zyuu3_d_feedback AS f
+    INNER JOIN zyuu3_d_drug AS d ON f~drug_id = d~drug_id
+    INNER JOIN zyuu3_d_customer AS c ON f~customer_id = c~id
+    INTO TABLE @DATA(lt_feedback).
+
+  TRY.
+      DATA o_feedback TYPE REF TO cl_salv_table.
+
+      cl_salv_table=>factory( IMPORTING
+                                r_salv_table = o_feedback
+                                CHANGING
+                                  t_table = lt_feedback ).
+
+      o_feedback->get_columns( )->set_optimize( abap_true ).
+      o_feedback->get_display_settings( )->set_list_header( 'Feedbacks' ).
+      o_feedback->get_display_settings( )->set_striped_pattern( abap_true ).
+      o_feedback->get_functions( )->set_all( abap_true ).
+      o_feedback->display( ).
+
+    CATCH cx_root INTO DATA(e_text).
+      WRITE:/ e_text->get_text( ).
+
+  ENDTRY.
+
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form display_yearly_orders
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display_yearly_orders .
+  CONCATENATE sy-datum(4) '0101' INTO my_date.
+
+  SELECT o~id, o~order_date, o~payment_amount, o~payment_status, c~first_name, c~last_name
+    FROM zyuu3_d_order AS o
+    INNER JOIN zyuu3_d_customer AS c ON o~customer_id = c~id
+    WHERE o~order_date >= @my_date AND o~order_date <= @sy-datum
+    ORDER BY o~order_date
+    INTO TABLE @DATA(lt_yearly_orders).
+
+  TRY.
+      DATA o_yearly_orders TYPE REF TO cl_salv_table.
+
+      cl_salv_table=>factory( IMPORTING
+                                r_salv_table = o_yearly_orders
+                                CHANGING
+                                  t_table = lt_yearly_orders ).
+      DATA(displayed_date) = |from { my_date+6(2) }.{ my_date+4(2) }.{ my_date(4) } to { sy-datum+6(2) }.{ sy-datum+4(2) }.{ sy-datum(4) } |.
+      o_yearly_orders->get_columns( )->set_optimize( abap_true ).
+      o_yearly_orders->get_display_settings( )->set_list_header( |Created orders { displayed_date }| ).
+      o_yearly_orders->display( ).
+
+    CATCH cx_root INTO DATA(e_text).
+      WRITE:/ e_text->get_text( ).
+
+  ENDTRY.
+  CLEAR my_date.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form display_last_month_orders
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display_last_month_orders.
+
+  CONCATENATE sy-datum(4) sy-datum+4(2) '01' INTO my_date.
+  to_date = my_date - 1.
+  CONCATENATE to_date(4) to_date+4(2) '01' INTO from_date.
+
+  SELECT o~id, o~order_date, o~payment_amount, o~payment_status, c~first_name, c~last_name
+    FROM zyuu3_d_order AS o
+    INNER JOIN zyuu3_d_customer AS c ON o~customer_id = c~id
+    WHERE o~order_date >= @from_date AND o~order_date <= @to_date
+    ORDER BY o~order_date
+    INTO TABLE @DATA(lt_last_month_orders).
+
+  TRY.
+      DATA o_last_month_orders TYPE REF TO cl_salv_table.
+
+      cl_salv_table=>factory( IMPORTING
+                                r_salv_table = o_last_month_orders
+                                CHANGING
+                                  t_table = lt_last_month_orders ).
+
+      o_last_month_orders->get_columns( )->set_optimize( abap_true ).
+      o_last_month_orders->get_display_settings( )->set_list_header( |Last month orders| ).
+      o_last_month_orders->display( ).
+
+    CATCH cx_root INTO DATA(e_text).
+      WRITE:/ e_text->get_text( ).
+
+  ENDTRY.
+
+  CLEAR my_date.
+  CLEAR from_date.
+  CLEAR to_date.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form display_this_month_orders
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display_this_month_orders .
+
+  CONCATENATE sy-datum(4) sy-datum+4(2) '01' INTO from_date.
+
+  SELECT o~id, o~order_date, o~payment_amount, o~payment_status, c~first_name, c~last_name
+    FROM zyuu3_d_order AS o
+    INNER JOIN zyuu3_d_customer AS c ON o~customer_id = c~id
+    WHERE o~order_date >= @from_date AND o~order_date <= @sy-datum
+    ORDER BY o~order_date
+    INTO TABLE @DATA(lt_this_month_orders).
+
+  TRY.
+      DATA o_this_month_orders TYPE REF TO cl_salv_table.
+
+      cl_salv_table=>factory( IMPORTING
+                                r_salv_table = o_this_month_orders
+                                CHANGING
+                                  t_table = lt_this_month_orders ).
+
+      o_this_month_orders->get_columns( )->set_optimize( abap_true ).
+      o_this_month_orders->get_display_settings( )->set_list_header( 'This month orders' ).
+      o_this_month_orders->display( ).
+
+    CATCH cx_root INTO DATA(e_text).
+      WRITE:/ e_text->get_text( ).
+
+  ENDTRY.
+
+  CLEAR my_date.
+  CLEAR from_date.
+  CLEAR to_date.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form display_last_7_days_orders
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display_last_7_days_orders .
+
+  from_date = sy-datum - 7.
+
+  SELECT o~id, o~order_date, o~payment_amount, o~payment_status, c~first_name, c~last_name
+    FROM zyuu3_d_order AS o
+    INNER JOIN zyuu3_d_customer AS c ON o~customer_id = c~id
+    WHERE o~order_date >= @from_date AND o~order_date <= @sy-datum
+    ORDER BY o~order_date
+    INTO TABLE @DATA(lt_last_7_days_orders).
+
+  TRY.
+      DATA o_last_7_days_orders TYPE REF TO cl_salv_table.
+
+      cl_salv_table=>factory( IMPORTING
+                                r_salv_table = o_last_7_days_orders
+                                CHANGING
+                                  t_table = lt_last_7_days_orders ).
+
+      o_last_7_days_orders->get_columns( )->set_optimize( abap_true ).
+      o_last_7_days_orders->get_display_settings( )->set_list_header( 'Last 7 days orders' ).
+      o_last_7_days_orders->display( ).
+
+    CATCH cx_root INTO DATA(e_text).
+      WRITE:/ e_text->get_text( ).
+
+  ENDTRY.
+
+  CLEAR my_date.
+  CLEAR from_date.
+  CLEAR to_date.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form display_top_customers
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display_top_customers .
+
+  SELECT c~first_name, c~last_name, c~gender, c~email, t~landx, COUNT( o~id ) AS order_count, SUM( o~payment_amount ) AS order_amount
+    FROM zyuu3_d_order AS o
+    INNER JOIN zyuu3_d_customer AS c ON c~id = o~customer_id
+    INNER JOIN zyuu3_d_feedback AS f ON o~customer_id = f~customer_id
+    INNER JOIN t005t AS t ON c~country = t~land1
+    WHERE o~payment_status = 'COMPLETE' AND t~spras = 'E'
+    GROUP BY c~first_name, c~last_name, c~gender, c~email, t~landx
+    ORDER BY order_amount DESCENDING
+    INTO TABLE @DATA(lt_top5)
+    UP TO 5 ROWS.
+
+  TRY.
+      DATA o_top5 TYPE REF TO cl_salv_table.
+
+      cl_salv_table=>factory( IMPORTING
+                                r_salv_table = o_top5
+                                CHANGING
+                                  t_table = lt_top5 ).
+
+      o_top5->get_columns( )->set_optimize( abap_true ).
+      o_top5->get_display_settings( )->set_list_header( 'Top 5 customers' ).
+      o_top5->display( ).
+
+
+    CATCH cx_root INTO DATA(e_text).
+      WRITE:/ e_text->get_text( ).
+
+  ENDTRY.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form display_bottom_customers
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display_bottom_customers .
+
+  SELECT c~first_name, c~last_name, c~gender, c~email, t~landx, COUNT( o~id ) AS order_count, SUM( o~payment_amount ) AS order_amount
+  FROM zyuu3_d_order AS o
+  INNER JOIN zyuu3_d_customer AS c ON c~id = o~customer_id
+  INNER JOIN zyuu3_d_feedback AS f ON o~customer_id = f~customer_id
+  INNER JOIN t005t AS t ON c~country = t~land1
+  WHERE o~payment_status = 'COMPLETE' AND t~spras = 'E'
+  GROUP BY c~first_name, c~last_name, c~gender, c~email, t~landx
+  ORDER BY order_amount ASCENDING
+  INTO TABLE @DATA(lt_bottom5)
+  UP TO 5 ROWS.
+
+  TRY.
+      DATA o_bottom5 TYPE REF TO cl_salv_table.
+
+      cl_salv_table=>factory( IMPORTING
+                                r_salv_table = o_bottom5
+                                CHANGING
+                                  t_table = lt_bottom5 ).
+
+      o_bottom5->get_columns( )->set_optimize( abap_true ).
+      o_bottom5->get_display_settings( )->set_list_header( 'Bottom 5 customers' ).
+      o_bottom5->display( ).
+
+
+    CATCH cx_root INTO DATA(e_text).
+      WRITE:/ e_text->get_text( ).
+
+  ENDTRY.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form display_customer
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display_customer .
+
+  CASE abap_true.
+
+    WHEN male_rb.
+      SELECT *
+        FROM zyuu3_d_customer
+        WHERE gender = 'M'
+          AND birt_date BETWEEN @f_date AND @t_date
+          OR country = @country
+        INTO TABLE @DATA(lt_selected_customers).
+
+    WHEN female_rb.
+      SELECT *
+        FROM zyuu3_d_customer
+        WHERE gender = 'F'
+          AND birt_date BETWEEN @f_date AND @t_date
+          OR country = @country
+        INTO TABLE @lt_selected_customers.
+
+    WHEN OTHERS.
+
+  ENDCASE.
+
+  TRY.
+      cl_salv_table=>factory( IMPORTING
+                           r_salv_table = DATA(o_selected_customers)
+                           CHANGING
+                             t_table = lt_selected_customers ).
+
+      o_selected_customers->display( ).
+
+    CATCH  cx_root INTO DATA(e_text).
+      WRITE:/ e_text->get_text( ).
+  ENDTRY.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form display_order
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display_order .
+
+  CASE abap_true.
+    WHEN completed.
+      SELECT *
+        FROM zyuu3_d_order
+        WHERE payment_status = 'COMPLETE' AND
+              order_date >= @from_date  AND
+              order_date <= @to_date
+        INTO TABLE @DATA(lt_selected_orders).
+
+    WHEN pending.
+      SELECT *
+       FROM zyuu3_d_order
+       WHERE payment_status = 'PENDING' AND
+             order_date >= @from_date  AND
+             order_date <= @to_date
+       INTO TABLE @lt_selected_orders.
+
+    WHEN failed.
+      SELECT *
+        FROM zyuu3_d_order
+        WHERE payment_status = 'FAILED' AND
+              order_date >= @from_date  AND
+              order_date <= @to_date
+        INTO TABLE @lt_selected_orders.
+
+  ENDCASE.
+
+  TRY.
+      cl_salv_table=>factory( IMPORTING
+                           r_salv_table = DATA(o_selected_orders)
+                           CHANGING
+                             t_table = lt_selected_orders ).
+      DATA(displayed_date) = |{ from_date+6(2) }.{ from_date+4(2) }.{ from_date(4) } to { to_date+6(2) }.{ to_date+4(2) }.{ to_date(4) }|.
+      o_selected_orders->get_columns( )->set_optimize( abap_true ).
+      o_selected_orders->get_display_settings( )->set_striped_pattern( abap_true ).
+      o_selected_orders->get_display_settings( )->set_list_header( |Created orders from { displayed_date } | ).
+      o_selected_orders->display( ).
+
+    CATCH  cx_root INTO DATA(e_text).
+      WRITE:/ e_text->get_text( ).
+
+  ENDTRY.
+
+ENDFORM.
+
+----------------------------------------------------------------------------------
+Extracted by Mass Download version 1.5.5 - E.G.Mellodew. 1998-2023. Sap Release 756

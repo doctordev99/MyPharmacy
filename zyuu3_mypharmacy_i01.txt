@@ -1,0 +1,69 @@
+*&---------------------------------------------------------------------*
+*& Include          ZYUU3_MYPHARMACY_I01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0100  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE user_command_0100 INPUT.
+  IF gv_ucomm_0100 IS INITIAL .
+    gv_ucomm_0100 = 'ENTER'.
+  ENDIF.
+
+  CASE gv_ucomm_0100.
+    WHEN 'CANCEL' OR 'BACK'.
+      LEAVE TO SCREEN 0.
+    WHEN 'EXIT'.
+      LEAVE PROGRAM.
+    WHEN 'O_LIST'.
+      PERFORM display_order_list.
+    WHEN 'P_LIST'.
+      PERFORM display_product_list.
+    WHEN 'E_LIST'.
+      PERFORM display_employee_list.
+    WHEN 'C_LIST'.
+      PERFORM display_customer_list.
+    WHEN 'F_LIST'.
+      PERFORM display_feedback_list.
+    WHEN 'YEAR'.
+      PERFORM display_yearly_orders.
+    WHEN 'LAST_MONTH'.
+      PERFORM display_last_month_orders.
+    WHEN 'THIS_MONTH'.
+      PERFORM display_this_month_orders.
+    WHEN 'LAST_7_DAYS'.
+      PERFORM display_last_7_days_orders.
+    WHEN 'TOP5'.
+      PERFORM display_top_customers.
+    WHEN 'BOTTOM5'.
+      PERFORM display_bottom_customers.
+    WHEN 'FIND_C'.
+      PERFORM display_customer.
+    WHEN 'FIND_O'.
+      PERFORM display_order.
+    WHEN 'QUICK'.
+      SELECT SINGLE
+        drug_id,
+        drug_name,
+        manufacturer,
+        category,
+        manufactured_date,
+        expire_date
+        FROM zyuu3_d_drug
+        INTO @str_product
+        WHERE drug_id = @id.
+
+        IF sy-subrc <> 0.
+          MESSAGE 'Data not found'
+            TYPE 'I'
+            DISPLAY LIKE 'E'.
+        ENDIF.
+
+
+  ENDCASE.
+
+ENDMODULE.
+
+----------------------------------------------------------------------------------
+Extracted by Mass Download version 1.5.5 - E.G.Mellodew. 1998-2023. Sap Release 756
